@@ -5,6 +5,10 @@ import { useAuth } from "../context/AuthContext";
 import "../styles/Board.css";
 import BoardPostItem from "../components/BoardPostItem";
 
+console.log("🌏 환경변수 확인:");
+console.log("KAKAO:", process.env.REACT_APP_KAKAO_KEY);
+console.log("SERVER:", process.env.REACT_APP_SERVER_URL);
+
 function Board() {
   const { posts, fetchPosts, loading, error } = usePost();
   const { user } = useAuth();

@@ -5,7 +5,6 @@ function useKakaoMapScript() {
   const kakaoKey = process.env.REACT_APP_KAKAO_KEY;
 
   useEffect(() => {
-    console.log("환경변수 전체:", process.env);
     // 이미 kakao가 로드된 경우
     if (window.kakao && window.kakao.maps) {
       if (window.kakao.maps.LatLng) {
