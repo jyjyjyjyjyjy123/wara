@@ -6,6 +6,7 @@ import "../styles/Board.css";
 import BoardPostItem from "../components/BoardPostItem";
 
 console.log("🌏 환경변수 확인:");
+console.log("API:", process.env.REACT_APP_API_URL);
 console.log("KAKAO:", process.env.REACT_APP_KAKAO_KEY);
 console.log("SERVER:", process.env.REACT_APP_SERVER_URL);
 
