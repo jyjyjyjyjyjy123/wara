@@ -153,6 +153,14 @@ public class PostController {
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
 
+            String originalName = file.getOriginalFilename();
+
+            if (originalName != null) {
+                originalName = originalName.replaceAll("\\s+", "_");
+
+                originalName = originalName.replaceAll("[^a-zA-Z0-9._()-]", "");
+            }
+
             String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             File destination = new File(uploadDir + filename);
             file.transferTo(destination);
