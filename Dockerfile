@@ -9,12 +9,13 @@ RUN npm run build
 # Stage 2: Spring 빌드
 FROM maven:3.9.4-eclipse-temurin-17 AS spring-build
 WORKDIR /app
-COPY pom.xml mvnw ./
-COPY mvnw.cmd ./
+COPY pom.xml ./
 COPY src ./src
-RUN chmod +x mvnw
 COPY --from=build /app/build ./src/main/resources/static
-RUN ./mvnw clean package -DskipTests
+
+# Maven wrapper 사용 안함
+RUN mvn clean package -DskipTests
+
 
 # Stage 3: 실행
 FROM openjdk:17-jdk-slim
