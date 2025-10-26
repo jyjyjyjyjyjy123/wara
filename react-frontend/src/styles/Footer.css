@@ -1,0 +1,38 @@
+.footer-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: var(--mobile-width);
+  height: 60px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #fff;
+  border-top: 1px solid var(--bg-color);
+  z-index: 99;
+}
+
+.footer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--main-color);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-item .footer-icon {
+  width:30px;
+  height:30px;
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+}
+
+.footer-item.active {
+  color: var(--bg-color);
+}
+
+.footer-item:hover {
+  color: var(--bg-color);
+}

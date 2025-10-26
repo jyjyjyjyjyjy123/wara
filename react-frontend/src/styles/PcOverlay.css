@@ -1,0 +1,122 @@
+/* PC 화면에서만 보이도록 */
+.pc-overlay {
+  display: none;
+}
+.pc-overlay svg {
+   width:30px;
+   height:30px;
+   fill: var(--sub-color);
+ }
+
+@media (min-width: 1100px) {
+  .pc-overlay {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* 화면 높이 전체 */
+    box-sizing: border-box;
+    z-index: 50;
+    justify-content: center;
+    position: relative;
+    top: -20%;
+  }
+
+  .pc-logo {
+    position: relative;
+    top: 190px;
+    left: -5px;
+    width: 480px;
+    height: auto;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+
+
+  /* 마이페이지 메뉴 */
+
+  .pc-mypage-keywords {
+      margin: 12px 0;
+    }
+
+  .pc-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .pc-card {
+    pointer-events: auto; /* 카드 안은 클릭 가능 */
+    padding: 15px;
+    background: var(--main-color);
+    border-radius: 50px;
+    border: 1px solid var(--sub-color);
+    font-size: 1rem;
+    color: var(--sub-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .pc-card:hover {
+    transform: translateY(-5px);
+  }
+
+  /* 검색 및 인기 검색어 */
+
+  .pc-search-form {
+    position: relative;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  .pc-search-form input {
+    height:60px;
+    flex: 1;
+    padding: 20px;
+    font-size:20px;
+    border-radius: 50px 0 0 50px;
+    border: 1px solid var(--main-color);
+    outline: none; /* 포커스 시 테두리 제거 */
+    caret-color: auto;
+  }
+
+  .pc-search-btn {
+    height:60px;
+    width:55px;
+    padding: 6px 10px;
+    border: none;
+    background-color: var(--main-color);
+    color: white;
+    cursor: pointer;
+    border-radius: 0 50px 50px 0;
+  }
+
+  .pc-popular-keywords {
+    margin: 12px 0;
+  }
+
+  .pc-keywords-list {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
+  }
+
+  .pc-keyword-btn {
+    width: 80px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--main-color);
+    background: var(--sub-color);
+    color:var(--main-color);
+    cursor: pointer;
+  }
+
+  .pc-keyword-btn:hover {
+    background-color: var(--main-color);
+    color: white;
+  }
+
+}

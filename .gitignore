@@ -1,0 +1,62 @@
+# -----------------------------
+# Maven / Java
+# -----------------------------
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# 빌드 결과물 제외 (특수 경우 추적 가능)
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# -----------------------------
+# React / Node
+# -----------------------------
+react-frontend/node_modules/
+react-frontend/build/
+react-frontend/.env
+
+# -----------------------------
+# 업로드 / 임시 파일
+# -----------------------------
+uploads/
+
+# -----------------------------
+# 환경 변수 / 민감 정보
+# -----------------------------
+application.properties
+react-frontend/.env
+
+# -----------------------------
+# IDE 설정
+# -----------------------------
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+nbbuild/
+dist/
+.nbdist/
+.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# -----------------------------
+# 일반 OS / 로그
+# -----------------------------
+*.log
+.DS_Store
+Thumbs.db

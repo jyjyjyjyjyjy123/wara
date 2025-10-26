@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.wara.mapper.MyPageMapper">
+
+    <!-- ============================== -->
+    <!-- 내 정보 수정 -->
+    <!-- ============================== -->
+    <!-- 현재 비밀번호 확인 -->
+    <select id="checkPassword" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM USER_TBL
+        WHERE user_seq = #{userSeq} AND password = #{currentPassword}
+    </select>
+
+    <!-- 내 정보 수정 -->
+    <update id="updateUserInfo" parameterType="com.project.wara.domain.User">
+        UPDATE USER_TBL
+        <set>
+            <if test="nickname != null and nickname != ''">
+                nickname = #{nickname},
+            </if>
+            <if test="profileImage != null">
+                profile_image = #{profileImage},
+            </if>
+            <if test="newPassword != null and newPassword != ''">
+                password = #{newPassword},
+            </if>
+        </set>
+        WHERE user_seq = #{userSeq}
+    </update>
+
+    <!-- 내 정보 조회 -->
+    <select id="selectUserSeq" parameterType="long" resultType="com.project.wara.domain.User">
+        SELECT user_seq, id as userId, password, nickname, profile_image as profileImage
+        FROM USER_TBL
+        WHERE user_seq = #{userSeq}
+    </select>
+
+    <!-- ============================== -->
+    <!-- 통계 -->
+    <!-- ============================== -->
+    <select id="countPosts" resultType="int">
+        SELECT COUNT(*) FROM POST_TBL
+        WHERE user_seq = #{userSeq}
+    </select>
+
+    <select id="countComments" resultType="int">
+        SELECT COUNT(*) FROM COMMENT_TBL
+        WHERE user_seq = #{userSeq}
+    </select>
+
+    <select id="countFavorites" resultType="int">
+        SELECT COUNT(*) FROM FAVORITE_TBL
+        WHERE user_seq = #{userSeq}
+    </select>
+
+    <select id="countLikes" resultType="int">
+        SELECT COUNT(*) FROM LIKE_TBL
+        WHERE user_seq = #{userSeq}
+    </select>
+
+    <!-- ============================== -->
+    <!-- 내 글 -->
+    <!-- ============================== -->
+    <select id="selectMyPosts" resultType="com.project.wara.domain.Post">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM AS rnum
+            FROM (
+                SELECT *
+                FROM POST_TBL
+                WHERE user_seq = #{userSeq}
+                ORDER BY created_at DESC
+            ) a
+            WHERE ROWNUM &lt;= #{offset} + #{limit}
+        )
+        WHERE rnum &gt; #{offset}
+    </select>
+
+    <!-- ============================== -->
+    <!-- 내 댓글 -->
+    <!-- ============================== -->
+    <select id="selectMyComments" resultType="com.project.wara.domain.Comment">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM AS rnum
+            FROM (
+                SELECT *
+                FROM COMMENT_TBL
+                WHERE user_seq = #{userSeq}
+                ORDER BY created_at DESC
+            ) a
+            WHERE ROWNUM &lt;= #{offset} + #{limit}
+            )
+        WHERE rnum &gt; #{offset}
+    </select>
+
+    <!-- ============================== -->
+    <!-- 즐겨찾기 -->
+    <!-- ============================== -->
+    <select id="selectMyFavorites" resultType="com.project.wara.domain.Post">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM AS rnum
+            FROM (
+                SELECT p.*
+                FROM FAVORITE_TBL f
+                JOIN POST_TBL p ON f.post_seq = p.post_seq
+                WHERE f.user_seq = #{userSeq}
+                ORDER BY f.favorite_seq DESC
+            ) a
+            WHERE ROWNUM &lt;= #{offset} + #{limit}
+            )
+        WHERE rnum &gt; #{offset}
+    </select>
+
+    <!-- ============================== -->
+    <!-- 좋아요 -->
+    <!-- ============================== -->
+    <select id="selectMyLikes" resultType="com.project.wara.domain.Post">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM AS rnum
+            FROM (
+                SELECT p.*
+                FROM LIKE_TBL l
+                JOIN POST_TBL p ON l.post_seq = p.post_seq
+                WHERE l.user_seq = #{userSeq}
+                ORDER BY l.like_seq DESC
+            ) a
+            WHERE ROWNUM &lt;= #{offset} + #{limit}
+            )
+        WHERE rnum &gt; #{offset}
+    </select>
+
+</mapper>

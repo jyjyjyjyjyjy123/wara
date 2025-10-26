@@ -1,0 +1,200 @@
+/* --------------------
+   배너 캐러셀
+-------------------- */
+.carousel-section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.carousel {
+  position: relative;
+  height: 300px; /* 추가 */
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 295px;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.slide.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 배너 진행바 (dots 대체) */
+.dots {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%; /* 전체 길이 */
+  height: 5px;
+  background: var(--sub-color); /* 배경 (비활성 구간) */
+  overflow: hidden;
+}
+
+.dot-bar {
+  position: absolute;  /* 중요 */
+  top: 0;
+  left: 0;
+  width:33.33%;
+  height: 100%;
+  background: var(--main-color); /* 활성 구간 */
+  transition: transform 0.4s ease; /* 부드럽게 이동 */
+}
+
+/* 배너 캐러셀 버튼 항상 보이기 */
+.carousel-section .prev,
+.carousel-section .next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--main-color);
+  border: none;
+  width: 24px;
+  height: 48px;
+  font-size: 3rem;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0.5;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.carousel-section .prev {
+  left: 0px;
+  border-radius: 0 6px 6px 0;
+}
+
+.carousel-section .next {
+  right: 0px;
+  border-radius: 6px 0 0 6px;
+}
+
+/* --------------------
+   인기글 / MD픽 / 인기 장소 공통
+-------------------- */
+.popular-section {
+  padding: 16px;
+}
+
+.popular-section h2 {
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--main-color)
+}
+
+.post-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.post-track-wrapper {
+  flex: 1;
+}
+
+.post-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.post-card {
+  flex: 0 0 auto;
+  width: 140px;
+  margin-right: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--sub-color);
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.post-info {
+  padding: 8px;
+}
+
+.post-info h3 {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.nickname {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.counts {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+/* 인기글/MD픽/인기 장소 버튼 hover 시만 표시 */
+.popular-section .post-carousel .prev,
+.popular-section .post-carousel .next {
+  display: none; /* 기본 숨김 */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--main-color);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.popular-section .post-carousel.hover-show-buttons:hover > .prev {
+  display: block;
+  left: 8px;
+}
+
+.popular-section .post-carousel.hover-show-buttons:hover > .next {
+  display: block;
+  right: 8px;
+}
+
+/* --------------------
+   반응형
+-------------------- */
+@media (min-width: 768px) {
+  .main-container {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
