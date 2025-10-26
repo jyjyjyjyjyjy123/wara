@@ -2,7 +2,7 @@ import React from "react";
 import defaultThumbnail from "../assets/images/default_thumbnail.png";
 
 const BoardPostItem = React.memo(({ post, navigate, formatDate }) => {
-  const thumbnail = post.thumbnail ? decodeURIComponent(post.thumbnail) ||
+  const thumbnail = post.thumbnail ? decodeURIComponent(post.thumbnail) :
     (post.images && post.images.length > 0 ? post.images[0].url : defaultThumbnail);
 
   return (
