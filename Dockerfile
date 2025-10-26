@@ -7,7 +7,7 @@ COPY react-frontend/ .
 RUN npm run build
 
 # Stage 2: Spring 빌드
-FROM maven:3.9.2-openjdk-17 AS spring-build
+FROM maven:3.9.4-eclipse-temurin-17 AS spring-build
 WORKDIR /app
 COPY pom.xml mvnw ./
 COPY mvnw.cmd ./
