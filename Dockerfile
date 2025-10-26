@@ -13,6 +13,9 @@ COPY pom.xml ./
 COPY src ./src
 COPY --from=build /app/build ./src/main/resources/static
 
+# 더미 이미지 복사
+COPY dummy-images/ ./src/main/resources/static/uploads
+
 # Maven wrapper 사용 안함
 RUN mvn clean package -DskipTests
 
