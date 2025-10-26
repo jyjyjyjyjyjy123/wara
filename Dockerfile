@@ -16,7 +16,6 @@ COPY --from=build /app/build ./src/main/resources/static
 # Maven wrapper 사용 안함
 RUN mvn clean package -DskipTests
 
-
 # Stage 3: 실행
 FROM openjdk:17-jdk-slim
 WORKDIR /app
