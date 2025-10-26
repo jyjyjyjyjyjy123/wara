@@ -42,6 +42,7 @@ public interface PostMapper {
 
     // ------------------ 게시글 삭제 API ------------------
     void deletePostContents(Long postSeq);
+    void deleteLogAll(Long postSeq);
     void deleteCommentAll(Long postSeq);
     void deleteLikeAll(Long postSeq);
     void deleteFavoriteAll(Long postSeq);

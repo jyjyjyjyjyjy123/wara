@@ -4,6 +4,7 @@ function useKakaoMapScript() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    console.log("카카오 키:", process.env.REACT_APP_KAKAO_KEY);
     // 이미 kakao가 로드된 경우
     if (window.kakao && window.kakao.maps) {
       if (window.kakao.maps.LatLng) {

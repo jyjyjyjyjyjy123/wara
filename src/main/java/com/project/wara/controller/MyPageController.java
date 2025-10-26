@@ -32,7 +32,7 @@ public class MyPageController {
 
     private final MyPageService myPageService;
 
-    private final String uploadDir = "C:/NS/wara/uploads/profileImage";
+    private final String uploadDir = System.getProperty("user.dir") + "/uploads/profileImage";
 
     /**
      * 내 정보 수정
@@ -45,9 +45,17 @@ public class MyPageController {
 
         // 프로필 이미지 업로드 처리
         if (profileImage != null && !profileImage.isEmpty()) {
+            // 디렉토리가 존재하지 않으면 생성
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
             String fileName = UUID.randomUUID() + "_" + profileImage.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir, fileName);
+            Path filePath = uploadPath.resolve(fileName);
             Files.copy(profileImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // 저장 후 DB에 저장될 URL 설정
             user.setProfileImage("/uploads/profileImage/" + fileName);
         }
 

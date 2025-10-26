@@ -106,6 +106,7 @@ public class PostService {
     // ------------------ 게시글 삭제 API ------------------
     public void deletePost(Long postSeq) {
         postMapper.deletePostContents(postSeq);
+        postMapper.deleteLogAll(postSeq);
         postMapper.deleteCommentAll(postSeq);
         postMapper.deleteLikeAll(postSeq);
         postMapper.deleteFavoriteAll(postSeq);

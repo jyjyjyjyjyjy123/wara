@@ -11,12 +11,12 @@
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="viewCount" column="view_count"/>
-        <result property="likeCount" column="likeCount"/>
-        <result property="favoriteCount" column="favoriteCount"/>
+        <result property="likeCount" column="likecount"/>
+        <result property="favoriteCount" column="favoritecount"/>
         <result property="thumbnail" column="thumbnail"/>
         <association property="user" javaType="com.project.wara.domain.User">
             <id property="userSeq" column="user_seq"/>
-            <result property="userId" column="Id"/>
+            <result property="userId" column="id"/>
             <result property="nickname" column="nickname"/>
             <result property="profileImage" column="profile_image"/>
         </association>
@@ -29,7 +29,7 @@
         <result property="createdAt" column="created_at"/>
         <association property="user" javaType="com.project.wara.domain.User">
             <id property="userSeq" column="user_seq"/>
-            <result property="userId" column="Id"/>
+            <result property="userId" column="id"/>
             <result property="nickname" column="nickname"/>
             <result property="profileImage" column="profile_image"/>
         </association>
@@ -218,7 +218,7 @@
 
     <!-- 댓글 관련 -->
     <insert id="insertComment" useGeneratedKeys="true" keyProperty="commentSeq"
-            keyColumn="comment_Seq" parameterType="com.project.wara.domain.Comment">
+            keyColumn="comment_seq" parameterType="com.project.wara.domain.Comment">
         INSERT INTO COMMENT_TBL ( post_seq, user_seq, content)
         VALUES (#{postSeq}, #{userSeq}, #{content})
     </insert>
@@ -255,6 +255,10 @@
         JOIN USER_TBL u ON p.user_seq = u.user_seq
         WHERE p.post_seq = #{postSeq}
     </select>
+    <delete id="deleteLogAll">
+        DELETE FROM post_view_log
+        WHERE post_seq = #{postSeq}
+    </delete>
     <delete id="deleteFavoriteAll">
         DELETE FROM favorite_tbl
         WHERE post_seq = #{postSeq}
