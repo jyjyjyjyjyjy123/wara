@@ -93,7 +93,7 @@ function Main() {
   // 인기글 카드
   const renderPopularPosts = (posts) =>
     posts.map((post) => {
-      const thumbnail = post.thumbnail || defaultThumbnail;
+      const thumbnail = post.thumbnail ? decodeURIComponent(post.thumbnail) || defaultThumbnail;
       return (
         <div
           key={post.postSeq}
