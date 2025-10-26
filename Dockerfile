@@ -12,6 +12,7 @@ WORKDIR /app
 COPY pom.xml mvnw ./
 COPY mvnw.cmd ./
 COPY src ./src
+RUN chmod +x mvnw
 COPY --from=build /app/build ./src/main/resources/static
 RUN ./mvnw clean package -DskipTests
 
