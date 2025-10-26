@@ -7,8 +7,8 @@
 
     <!-- 사용자 등록 -->
     <insert id="insertUser" parameterType="com.project.wara.domain.User">
-        INSERT INTO USER_TBL (user_seq, id, password, nickname, profile_image)
-        VALUES (user_seq_seq.NEXTVAL, #{userId}, #{password}, #{nickname}, #{profileImage, jdbcType=VARCHAR})
+        INSERT INTO USER_TBL (id, password, nickname, profile_image)
+        VALUES (#{userId}, #{password}, #{nickname}, #{profileImage, jdbcType=VARCHAR})
     </insert>
 
     <!-- 아이디로 회원 조회 -->

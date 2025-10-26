@@ -11,12 +11,12 @@
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="viewCount" column="view_count"/>
-        <result property="likeCount" column="likecount"/>
-        <result property="favoriteCount" column="favoritecount"/>
+        <result property="likeCount" column="likeCount"/>
+        <result property="favoriteCount" column="favoriteCount"/>
         <result property="thumbnail" column="thumbnail"/>
         <association property="user" javaType="com.project.wara.domain.User">
             <id property="userSeq" column="user_seq"/>
-            <result property="userId" column="id"/>
+            <result property="userId" column="Id"/>
             <result property="nickname" column="nickname"/>
             <result property="profileImage" column="profile_image"/>
         </association>
@@ -29,7 +29,7 @@
         <result property="createdAt" column="created_at"/>
         <association property="user" javaType="com.project.wara.domain.User">
             <id property="userSeq" column="user_seq"/>
-            <result property="userId" column="id"/>
+            <result property="userId" column="Id"/>
             <result property="nickname" column="nickname"/>
             <result property="profileImage" column="profile_image"/>
         </association>
@@ -40,18 +40,15 @@
         SELECT *
         FROM (
         SELECT p.post_seq, p.title, p.user_seq, p.created_at, p.updated_at, p.view_count,
-        COALESCE(vc.total_views, 0) AS total_views,
+        COALESCE(vc.total_views,0) AS total_views,
         (SELECT COUNT(*) FROM like_tbl l WHERE l.post_seq = p.post_seq) AS likecount,
         (SELECT COUNT(*) FROM favorite_tbl f WHERE f.post_seq = p.post_seq) AS favoritecount,
         (
         SELECT content
-        FROM (
-        SELECT pc.content AS content, pc.post_seq AS pc_post_seq,
-        ROW_NUMBER() OVER (PARTITION BY pc.post_seq ORDER BY pc.order_num ASC) AS rn
         FROM post_content_tbl pc
-        WHERE pc.type='IMAGE'
-        ) sub
-        WHERE sub.rn = 1 AND sub.pc_post_seq = p.post_seq
+        WHERE pc.type='IMAGE' AND pc.post_seq = p.post_seq
+        ORDER BY pc.order_num ASC
+        LIMIT 1
         ) AS thumbnail
         FROM post_tbl p
         LEFT JOIN (
@@ -59,19 +56,23 @@
         FROM post_view_log
         GROUP BY post_seq
         ) vc ON vc.post_seq = p.post_seq
-        ORDER BY COALESCE(vc.total_views, 0) DESC
+        ORDER BY COALESCE(vc.total_views,0) DESC
         LIMIT 9
-        ) sub
+        ) t
     </select>
 
     <!-- 인기 위치 -->
     <select id="getTopLocations" resultType="com.project.wara.domain.PostContent">
-        SELECT SUBSTRING(pc.content FROM 1 FOR 1000) AS content
+        SELECT content
+        FROM (
+        SELECT SUBSTRING(pc.content FROM 1 FOR 1000) AS content,
+        COUNT(*) AS cnt
         FROM post_content_tbl pc
         WHERE pc.type = 'LOCATION'
         GROUP BY SUBSTRING(pc.content FROM 1 FOR 1000)
-        ORDER BY COUNT(*) DESC
+        ORDER BY cnt DESC
         LIMIT 9
+        ) sub
     </select>
 
     <!-- 전체 게시글 조회 -->
@@ -85,17 +86,25 @@
         (
         SELECT pc.content
         FROM post_content_tbl pc
-        WHERE pc.post_seq = p.post_seq
-        AND pc.type = 'IMAGE'
+        WHERE pc.post_seq = p.post_seq AND pc.type='IMAGE'
+        ORDER BY pc.order_num ASC
         LIMIT 1
         ) AS thumbnail,
         ROW_NUMBER() OVER (
         ORDER BY
         <choose>
-            <when test="sort == 'view'">p.view_count DESC</when>
-            <when test="sort == 'favorite'">(SELECT COUNT(*) FROM favorite_tbl f2 WHERE f2.post_seq = p.post_seq) DESC</when>
-            <when test="sort == 'like'">(SELECT COUNT(*) FROM like_tbl l2 WHERE l2.post_seq = p.post_seq) DESC</when>
-            <otherwise>p.created_at DESC</otherwise>
+            <when test="sort == 'view'">
+                p.view_count DESC
+            </when>
+            <when test="sort == 'favorite'">
+                (SELECT COUNT(*) FROM favorite_tbl f2 WHERE f2.post_seq = p.post_seq) DESC
+            </when>
+            <when test="sort == 'like'">
+                (SELECT COUNT(*) FROM like_tbl l2 WHERE l2.post_seq = p.post_seq) DESC
+            </when>
+            <otherwise>
+                p.created_at DESC
+            </otherwise>
         </choose>
         ) AS rn
         FROM post_tbl p
@@ -104,18 +113,21 @@
         WHERE t.rn &gt; #{offset} AND t.rn &lt;= #{offset} + #{limit}
     </select>
 
+    <!-- 게시글 총 개수 -->
     <select id="countPosts" resultType="int">
         SELECT COUNT(*) FROM post_tbl
     </select>
 
+    <!-- 단일 게시글 -->
     <select id="getPost" parameterType="long" resultMap="PostResultMap">
         SELECT  p.post_seq, p.title, p.created_at, p.updated_at, p.view_count,
-        u.user_seq, u.id, u.nickname, u.profile_image
+                u.user_seq, u.id, u.nickname, u.profile_image
         FROM post_tbl p
         JOIN user_tbl u ON p.user_seq = u.user_seq
         WHERE p.post_seq = #{postSeq}
     </select>
 
+    <!-- 게시글 내용 -->
     <select id="getPostContents" parameterType="long" resultType="com.project.wara.domain.PostContent">
         SELECT post_content_seq, post_seq, type, content, latitude, longitude, order_num
         FROM post_content_tbl
@@ -123,125 +135,160 @@
         ORDER BY order_num ASC
     </select>
 
+    <!-- 댓글 + 작성자 -->
     <select id="getComments" parameterType="long" resultMap="CommentResultMap">
         SELECT  c.comment_seq, c.post_seq, c.content, c.created_at,
-        u.id, u.nickname, u.profile_image
+                u.id, u.nickname, u.profile_image
         FROM comment_tbl c
         JOIN user_tbl u ON c.user_seq = u.user_seq
         WHERE c.post_seq = #{postSeq}
         ORDER BY c.created_at ASC
     </select>
 
+    <!-- 조회수 1 증가 -->
     <update id="incrementViewCount">
-        UPDATE post_tbl
-        SET view_count = COALESCE(view_count,0) + 1
+        UPDATE POST_TBL
+        SET view_count = COALESCE(view_count, 0) + 1
         WHERE post_seq = #{postSeq}
     </update>
 
+    <!-- 조회 로그 확인 -->
     <select id="hasViewedRecently" resultType="boolean">
         SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
         FROM post_view_log
         WHERE post_seq = #{postSeq}
-        AND ((user_seq IS NOT NULL AND user_seq = #{userSeq}) OR (user_seq IS NULL AND client_id = #{clientId}))
-        AND viewed_at > NOW() - INTERVAL '1 hour'
+        AND ((user_seq IS NOT NULL AND user_seq = #{userSeq})
+        OR (user_seq IS NULL AND client_id = #{clientId}))
+        AND viewed_at &gt; NOW() - INTERVAL '1 hour'
     </select>
 
+    <!-- 로그 기록 -->
     <insert id="insertViewLog">
-        INSERT INTO post_view_log (post_seq, user_seq, client_id, viewed_at)
-        VALUES (#{postSeq}, #{userSeq}, #{clientId}, NOW())
+        INSERT INTO POST_VIEW_LOG (POST_SEQ, USER_SEQ, CLIENT_ID, VIEWED_AT)
+        VALUES ( #{postSeq}, #{userSeq}, #{clientId}, NOW() )
     </insert>
 
+    <!-- 좋아요 관련 -->
     <select id="isLiked" resultType="boolean">
-        SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
-        FROM like_tbl
-        WHERE post_seq = #{postSeq} AND user_seq = #{userSeq}
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM like_tbl l
+        JOIN user_tbl u ON l.user_seq = u.user_seq
+        WHERE l.post_seq = #{postSeq} AND u.user_seq = #{userSeq}
     </select>
 
     <select id="countLikes" resultType="int">
-        SELECT COUNT(*) FROM like_tbl WHERE post_seq = #{postSeq}
+        SELECT COUNT(*)
+        FROM like_tbl
+        WHERE post_seq = #{postSeq}
     </select>
 
     <insert id="insertLike">
-        INSERT INTO like_tbl (post_seq, user_seq) VALUES (#{postSeq}, #{userSeq})
+        INSERT INTO like_tbl (post_seq, user_seq)
+        VALUES (#{postSeq}, #{userSeq})
     </insert>
 
     <delete id="deleteLike">
-        DELETE FROM like_tbl WHERE post_seq = #{postSeq} AND user_seq = #{userSeq}
+        DELETE FROM like_tbl
+        WHERE post_seq = #{postSeq} AND user_seq = #{userSeq}
     </delete>
 
+    <!-- 즐겨찾기 관련 -->
     <select id="isFavorited" resultType="boolean">
-        SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
-        FROM favorite_tbl
-        WHERE post_seq = #{postSeq} AND user_seq = #{userSeq}
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM favorite_tbl f
+        JOIN user_tbl u ON f.user_seq = u.user_seq
+        WHERE f.post_seq = #{postSeq} AND u.user_seq = #{userSeq}
     </select>
 
     <select id="countFavorites" resultType="int">
-        SELECT COUNT(*) FROM favorite_tbl WHERE post_seq = #{postSeq}
+        SELECT COUNT(*)
+        FROM favorite_tbl
+        WHERE post_seq = #{postSeq}
     </select>
 
     <insert id="insertFavorite">
-        INSERT INTO favorite_tbl (post_seq, user_seq) VALUES (#{postSeq}, #{userSeq})
+        INSERT INTO favorite_tbl (post_seq, user_seq)
+        VALUES (#{postSeq}, #{userSeq})
     </insert>
 
     <delete id="deleteFavorite">
-        DELETE FROM favorite_tbl WHERE post_seq = #{postSeq} AND user_seq = #{userSeq}
+        DELETE FROM favorite_tbl
+        WHERE post_seq = #{postSeq} AND user_seq = #{userSeq}
     </delete>
 
-    <insert id="insertComment" useGeneratedKeys="true" keyProperty="commentSeq" keyColumn="comment_seq" parameterType="com.project.wara.domain.Comment">
-        INSERT INTO comment_tbl (post_seq, user_seq, content)
+    <!-- 댓글 관련 -->
+    <insert id="insertComment" useGeneratedKeys="true" keyProperty="commentSeq"
+            keyColumn="comment_Seq" parameterType="com.project.wara.domain.Comment">
+        INSERT INTO COMMENT_TBL ( post_seq, user_seq, content)
         VALUES (#{postSeq}, #{userSeq}, #{content})
     </insert>
 
     <delete id="deleteComment" parameterType="long">
-        DELETE FROM comment_tbl WHERE comment_seq = #{commentSeq}
+        DELETE FROM COMMENT_TBL WHERE comment_seq = #{commentSeq}
     </delete>
 
-    <insert id="insertPost" parameterType="com.project.wara.domain.Post" useGeneratedKeys="true" keyProperty="postSeq" keyColumn="post_seq">
-        INSERT INTO post_tbl (title, user_seq) VALUES (#{title}, #{user.userSeq})
+    <!-- 게시글 및 콘텐츠 INSERT -->
+    <insert id="insertPost" parameterType="Post" useGeneratedKeys="true"
+            keyProperty="postSeq" keyColumn="post_seq">
+        INSERT INTO POST_TBL (title, user_seq)
+        VALUES (#{title}, #{user.userSeq})
     </insert>
 
     <insert id="insertPostContent">
-        INSERT INTO post_content_tbl (post_seq, type, content, latitude, longitude, order_num)
-        VALUES (#{postSeq}, #{type}, #{content}, #{latitude}, #{longitude}, #{orderNum})
+        INSERT INTO POST_CONTENT_TBL (
+            post_seq, type, content, latitude, longitude, order_num
+        )
+        VALUES (
+            #{postSeq}, #{type}, #{content},
+            #{latitude, jdbcType=DOUBLE}, #{longitude, jdbcType=DOUBLE}, #{orderNum}
+        )
     </insert>
 
+    <!-- 게시글 수정/삭제 -->
     <update id="updatePostTitle" parameterType="map">
-        UPDATE post_tbl SET title = #{title}, updated_at = NOW() WHERE post_seq = #{postSeq}
+        UPDATE POST_TBL SET title = #{title}, updated_at = CURRENT_TIMESTAMP WHERE post_seq = #{postSeq}
     </update>
-
+    <select id="findById" resultMap="PostResultMap" parameterType="long">
+        SELECT  p.post_seq, p.title, p.created_at, p.updated_at, p.view_count,
+                u.user_seq, u.id AS user_id, u.nickname, u.profile_image
+        FROM POST_TBL p
+        JOIN USER_TBL u ON p.user_seq = u.user_seq
+        WHERE p.post_seq = #{postSeq}
+    </select>
     <delete id="deleteFavoriteAll">
-        DELETE FROM favorite_tbl WHERE post_seq = #{postSeq}
+        DELETE FROM favorite_tbl
+        WHERE post_seq = #{postSeq}
     </delete>
-
     <delete id="deleteLikeAll">
-        DELETE FROM like_tbl WHERE post_seq = #{postSeq}
+        DELETE FROM like_tbl
+        WHERE post_seq = #{postSeq}
     </delete>
-
     <delete id="deleteCommentAll">
-        DELETE FROM comment_tbl WHERE post_seq = #{postSeq}
+        DELETE FROM COMMENT_TBL
+        WHERE post_seq = #{postSeq}
+    </delete>
+    <delete id="deletePostContents" parameterType="long">
+        DELETE FROM POST_CONTENT_TBL WHERE post_seq = #{postSeq}
+    </delete>
+    <delete id="deletePost" parameterType="long">
+        DELETE FROM POST_TBL WHERE post_seq = #{postSeq}
     </delete>
 
-    <delete id="deletePostContents">
-        DELETE FROM post_content_tbl WHERE post_seq = #{postSeq}
-    </delete>
-
-    <delete id="deletePost">
-        DELETE FROM post_tbl WHERE post_seq = #{postSeq}
-    </delete>
-
+    <!-- 위치 데이터가 포함된 게시글 조회 -->
     <select id="getPostsWithLocations" resultType="com.project.wara.domain.PostContent">
         SELECT pc.post_seq, p.title, u.nickname, pc.latitude, pc.longitude, pc.content
-        FROM post_content_tbl pc
-        JOIN post_tbl p ON p.post_seq = pc.post_seq
-        JOIN user_tbl u ON u.user_seq = p.user_seq
+        FROM POST_CONTENT_TBL pc
+        JOIN POST_TBL p ON p.post_seq = pc.post_seq
+        JOIN USER_TBL u ON u.user_seq = p.user_seq
         WHERE pc.type = 'LOCATION'
     </select>
 
+    <!-- 특정 위치 근처 게시글 조회 -->
     <select id="getPostsNearLocation" resultType="com.project.wara.domain.Post">
         SELECT DISTINCT p.post_seq, p.title, u.nickname, p.created_at, pc.latitude, pc.longitude
-        FROM post_tbl p
-        JOIN post_content_tbl pc ON p.post_seq = pc.post_seq
-        JOIN user_tbl u ON u.user_seq = p.user_seq
+        FROM POST_TBL p
+        JOIN POST_CONTENT_TBL pc ON p.post_seq = pc.post_seq
+        JOIN USER_TBL u ON u.user_seq = p.user_seq
         WHERE pc.type = 'LOCATION'
         AND ABS(pc.latitude - #{latitude}) &lt; 0.001
         AND ABS(pc.longitude - #{longitude}) &lt; 0.001
