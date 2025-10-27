@@ -6,7 +6,7 @@ import { usePost } from "../context/PostDetailContext";
 import LocationMap from "../components/LocationMap";
 import "../styles/PostDetail.css";
 
-const SERVER_BASE_URL = process.env.REACT_APP_SERVER_URL /*|| "http://localhost:8050"*/;
+const SERVER_BASE_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:8050";
 
 function PostDetail() {
   const navigate = useNavigate();

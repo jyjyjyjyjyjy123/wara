@@ -25,6 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String uploadPath = "file:" + System.getProperty("user.dir") + "/uploads/";
+        System.out.println("사진저장되는곳: " + uploadPath);
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(uploadPath)
                 .setCachePeriod(3600); // 캐시 1시간 설정 (필요시 조절)

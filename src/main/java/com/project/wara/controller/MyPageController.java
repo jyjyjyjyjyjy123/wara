@@ -59,8 +59,6 @@ public class MyPageController {
             user.setProfileImage("/uploads/profileImage/" + fileName);
         }
 
-        System.out.println("데이터: " + user);
-
         User updatedUser = myPageService.updateUserInfo(user);
         return ResponseEntity.ok(updatedUser);
     }

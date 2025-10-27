@@ -10,12 +10,14 @@
 .main-content {
   flex: 1;
   padding-top: 45px; /* Header 높이만큼 */
-  padding-bottom: 60px; /* Footer 높이만큼 */
+  padding-bottom: 200px; /* Footer 높이만큼 */
 }
 
 /* PC 배경일 때 */
-@media (min-width: 768px) {
-  .layout {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+@media (min-width: 480px) {
+  .main-content {
+    flex: 1;
+    padding-top: 45px; /* Header 높이만큼 */
+    padding-bottom: 60px; /* Footer 높이만큼 */
   }
 }

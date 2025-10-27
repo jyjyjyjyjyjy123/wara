@@ -26,7 +26,6 @@ export const PostDetailProvider = ({ children }) => {
           params: { userSeq: user?.userSeq },
         });
         setPost(res.data);
-        console.log("PostDetail 데이터:", res);
       } catch {
         setError("게시글을 불러오는 데 실패했습니다.");
       } finally {

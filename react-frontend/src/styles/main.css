@@ -93,6 +93,7 @@
 -------------------- */
 .popular-section {
   padding: 16px;
+  overflow: hidden;
 }
 
 .popular-section h2 {
@@ -120,7 +121,7 @@
 .post-card {
   flex: 0 0 auto;
   width: 140px;
-  margin-right: 16px;
+  margin-right: 15px;
   border-radius: 12px;
   border: 1px solid var(--sub-color);
   background: #fff;

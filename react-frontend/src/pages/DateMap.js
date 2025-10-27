@@ -18,8 +18,6 @@ function DateMap() {
     if (!kakaoLoaded || !window.kakao) return;
 
     const container = document.getElementById("map");
-    console.log("window.kakao:", window.kakao);
-      console.log("window.kakao.maps.LatLng:", window.kakao?.maps?.LatLng);
 
     const options = {
       center: new window.kakao.maps.LatLng(37.5665, 126.9780),
