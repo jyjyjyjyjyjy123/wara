@@ -53,11 +53,12 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 16px;
+    flex-wrap: wrap;
 }
 
 .left-actions button,
 .right-actions button {
-  margin-right: 8px;
+  margin: 0 8px 8px 0;
 }
 
 .action-button {

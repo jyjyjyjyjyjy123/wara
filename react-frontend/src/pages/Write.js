@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import { useParams, useNavigate } from "react-router-dom";
+import useKakaoMapScript from "../hooks/useKakaoMapScript";
 import "../styles/Write.css";
 
-const { kakao } = window;
 
 const Write = ({ editMode }) => {
   const { user } = useAuth();
@@ -21,6 +21,7 @@ const Write = ({ editMode }) => {
   const [selectedLocationId, setSelectedLocationId] = useState(null);
 
   const searchTimeoutRef = useRef(null);
+  const kakaoLoaded = useKakaoMapScript();
 
   // 수정 모드 시 기존 글 불러오기
   useEffect(() => {
@@ -80,8 +81,11 @@ const Write = ({ editMode }) => {
 
   // 위치 검색
   const searchLocations = (keyword, callback) => {
-    if (!kakao || !kakao.maps.services) return;
-    const ps = new kakao.maps.services.Places();
+    if (!kakaoLoaded || !window.kakao?.maps?.services) {
+      console.warn("카카오맵 SDK가 아직 준비되지 않음");
+      return;
+    }
+    const ps = new window.kakao.maps.services.Places();
     ps.keywordSearch(keyword, callback, { size: 8 });
   };
 
@@ -102,7 +106,7 @@ const Write = ({ editMode }) => {
 
     searchTimeoutRef.current = setTimeout(() => {
       searchLocations(value, (data, status) => {
-        if (status === kakao.maps.services.Status.OK) setSearchResults(data.slice(0, 8));
+        if (status === window.kakao.maps.services.Status.OK) setSearchResults(data.slice(0, 8));
         else setSearchResults([]);
         setIsSearching(false);
       });

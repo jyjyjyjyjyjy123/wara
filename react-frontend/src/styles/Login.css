@@ -87,3 +87,9 @@
   color: var(--bg-color);
   text-decoration: underline;
 }
+
+@media (max-width: 479px) {
+    .login-container {
+      margin: 10% auto;
+    }
+}

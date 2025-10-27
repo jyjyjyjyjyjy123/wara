@@ -10,7 +10,7 @@
 .main-content {
   flex: 1;
   padding-top: 45px; /* Header 높이만큼 */
-  padding-bottom: 200px; /* Footer 높이만큼 */
+  padding-bottom: 120px; /* Footer 높이만큼 */
 }
 
 /* PC 배경일 때 */
