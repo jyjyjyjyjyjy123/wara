@@ -40,7 +40,7 @@ RUN mvn clean package -DskipTests
 # -----------------------------
 # Stage 3: 실행
 # -----------------------------
-FROM openjdk:17-jdk-slim
+FROM openjdk:17.0.8-jdk-slim
 WORKDIR /app
 
 # Spring 빌드 결과 복사
